@@ -167,11 +167,26 @@
   .about { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(32px, 6vw, 80px); align-items: center; }
   .portrait {
     position: relative; aspect-ratio: 4/5; border-radius: 28px; overflow: hidden;
-    background: url(assets/hero-poster.jpg) 60% center / cover no-repeat, #2a0f55;
+    background: #1a0d2e;
     box-shadow: 0 30px 80px rgba(139,61,255,.25);
   }
-  .portrait video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(1.1) contrast(1.05); mix-blend-mode: luminosity; }
-  .portrait::after { content: ''; position: absolute; inset: 0; background: linear-gradient(160deg, rgba(139,61,255,.45), rgba(255,61,187,.25)); mix-blend-mode: color; }
+  /* the photo has a bright white wall: dim it, tint the light areas purple and
+     fade the edges into the dark page, keeping Lenka's face the brightest part */
+  .portrait img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 40% 35%;
+    filter: brightness(.82) contrast(1.08) saturate(1.05);
+    transition: transform .6s, filter .6s;
+  }
+  .portrait:hover img { transform: scale(1.04); filter: brightness(.92) contrast(1.08) saturate(1.1); }
+  .portrait::before {
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(160deg, #9b6cff 0%, #c79bff 45%, #e07ad0 100%);
+    mix-blend-mode: multiply; opacity: .55;
+  }
+  .portrait::after {
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: radial-gradient(ellipse 65% 55% at 40% 40%, transparent 30%, rgba(26,10,50,.55) 75%, rgba(10,5,20,.9) 100%);
+  }
   .portrait-tag { position: absolute; z-index: 2; left: 20px; bottom: 20px; padding: 10px 18px; border-radius: 999px; background: rgba(7,5,12,.7); backdrop-filter: blur(8px); font-weight: 600; border: 1px solid var(--line); }
   .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 36px; }
   .stat { padding: 20px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); }
@@ -231,8 +246,15 @@
   }
   .slot time { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--violet); }
   .slot h4 { font-size: 1.1rem; }
-  .slot small { color: var(--muted); }
+  .slot h4 span { color: var(--violet); font-weight: 400; }
+  .slot small { display: block; color: var(--muted); }
   .slot .btn { padding: 10px 20px; font-size: .9rem; }
+  .tab { position: relative; }
+  .tab.has-class::after {
+    content: ''; position: absolute; top: 6px; right: 8px; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--magenta); box-shadow: 0 0 8px var(--magenta);
+  }
+  .tab.active.has-class::after { background: #fff; box-shadow: none; }
   .empty { color: var(--muted); padding: 24px; border: 1px dashed var(--line); border-radius: 18px; text-align: center; }
   @keyframes slotIn { from { opacity: 0; transform: translateX(-20px); } }
   @media (max-width: 600px) { .slot { grid-template-columns: 1fr; gap: 6px; } .slot .btn { justify-self: start; margin-top: 8px; } }
@@ -246,6 +268,65 @@
   .dots { display: flex; justify-content: center; gap: 10px; margin-top: 28px; }
   .dots button { width: 10px; height: 10px; border-radius: 5px; border: 0; background: var(--line); cursor: pointer; transition: all .3s; }
   .dots button.active { width: 32px; background: var(--grad); }
+
+  /* gallery */
+  .gallery {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 40px;
+  }
+  .gallery-item {
+    position: relative; overflow: hidden; border-radius: 22px; aspect-ratio: 3/4;
+    border: 1px solid var(--line); background: var(--card); cursor: zoom-in; padding: 0; font: inherit; color: inherit;
+  }
+  /* the group photo gets a 2x2 block, so it keeps roughly its own shape instead of a thin strip */
+  .gallery-item:first-child { grid-column: span 2; grid-row: span 2; aspect-ratio: auto; }
+  .gallery-item:first-child img { position: absolute; inset: 0; object-position: 50% 60%; }
+  .gallery-item img {
+    width: 100%; height: 100%; object-fit: cover;
+    filter: brightness(.8) saturate(.95); transition: transform .7s cubic-bezier(.2,.8,.2,1), filter .5s;
+  }
+  .gallery-item::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(139,61,255,.15) 0%, transparent 40%, rgba(7,5,12,.85) 100%);
+    transition: opacity .4s;
+  }
+  .gallery-item .cap {
+    position: absolute; z-index: 1; left: 18px; right: 18px; bottom: 16px; text-align: left;
+    font-weight: 600; color: var(--text); transform: translateY(8px); opacity: .85; transition: transform .4s, opacity .4s;
+  }
+  .gallery-item:hover img, .gallery-item:focus-visible img { transform: scale(1.08); filter: brightness(1) saturate(1.05); }
+  .gallery-item:hover .cap, .gallery-item:focus-visible .cap { transform: none; opacity: 1; }
+  .gallery-item:hover { border-color: var(--purple); box-shadow: 0 20px 60px rgba(139,61,255,.3); }
+  .gallery-item:focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; }
+  @media (max-width: 760px) {
+    .gallery { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .gallery-item:first-child { grid-row: auto; grid-column: span 2; aspect-ratio: 3/4; }
+    .gallery-item .cap { font-size: .85rem; left: 12px; bottom: 10px; }
+  }
+
+  /* lightbox */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100; display: grid; place-items: center;
+    background: rgba(7,5,12,.94); backdrop-filter: blur(10px);
+    opacity: 0; pointer-events: none; transition: opacity .35s;
+  }
+  .lightbox.open { opacity: 1; pointer-events: auto; }
+  .lightbox figure { max-width: min(92vw, 1100px); text-align: center; }
+  .lightbox img {
+    max-width: 100%; max-height: 80vh; margin: 0 auto; border-radius: 18px;
+    box-shadow: 0 30px 100px rgba(139,61,255,.35); transform: scale(.96); transition: transform .35s;
+  }
+  .lightbox.open img { transform: none; }
+  .lightbox figcaption { margin-top: 14px; color: var(--muted); }
+  .lb-btn {
+    position: absolute; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center;
+    background: rgba(139,61,255,.2); border: 1px solid var(--line); color: #fff; font-size: 1.6rem; cursor: pointer;
+    transition: background .2s, transform .2s;
+  }
+  .lb-btn:hover { background: var(--purple); transform: scale(1.08); }
+  .lb-close { top: 20px; right: 20px; }
+  .lb-prev { left: 20px; top: 50%; margin-top: -26px; }
+  .lb-next { right: 20px; top: 50%; margin-top: -26px; }
+  @media (max-width: 600px) { .lb-prev, .lb-next { top: auto; bottom: 20px; margin: 0; } }
 
   /* faq */
   .faq { max-width: 820px; margin-top: 36px; }
@@ -275,7 +356,8 @@
   <ul class="nav-links">
     <li><a href="#about">O mne</a></li>
     <!-- <li><a href="#classes">Hodiny</a></li> -->
-    <!-- <li><a href="#schedule">Rozvrh</a></li> -->
+    <li><a href="#schedule">Rozvrh</a></li>
+    <li><a href="#gallery">Galéria</a></li>
     <li><a href="#reviews">Recenzie</a></li>
     <li><a href="#faq">Otázky</a></li>
   </ul>
@@ -306,7 +388,7 @@
 <section id="about">
   <div class="about">
     <div class="portrait reveal">
-      <video class="bg-video" muted loop playsinline preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1" data-src="assets/hero-720.mp4"></video>
+      <img src="assets/lenka.jpg" alt="Lenka, inštruktorka Zumby" width="1000" height="1250" loading="lazy">
       <div class="portrait-tag">💜 Licencovaná inštruktorka Zumba®</div>
     </div>
     <div class="reveal">
@@ -316,7 +398,7 @@
       <div class="stats">
         <div class="stat"><b data-count="8">0</b><small>rokov skúseností</small></div>
         <div class="stat"><b data-count="1200" data-suffix="+">0</b><small>spokojných tanečníkov</small></div>
-        <div class="stat"><b data-count="6">0</b><small>hodín týždenne</small></div>
+        <div class="stat"><b data-count="4">0</b><small>hodiny týždenne</small></div>
       </div>
     </div>
   </div>
@@ -358,16 +440,33 @@
 </section>
 ===== /Štýly hodín ===== -->
 
-<!-- ===== DOČASNE SKRYTÉ: Týždenný rozvrh =====
-     Na obnovenie stačí odstrániť tento komentár (a odkomentovať odkaz "Rozvrh" v menu).
-     Časy hodín sa upravujú v objekte SCHEDULE v <script> nižšie.
+<!-- Časy a miesta hodín sa upravujú v objekte SCHEDULE v <script> nižšie. -->
 <section id="schedule">
   <p class="eyebrow reveal">Týždenný rozvrh</p>
-  <h2 class="reveal">Vyber si <span class="grad">deň</span></h2>
+  <h2 class="reveal">Kde ma <span class="grad">zastihneš</span></h2>
+  <p class="lead reveal">Vyber si deň a príď si zatancovať. Ideálne pár minút pred začiatkom.</p>
   <div class="tabs reveal" role="tablist"></div>
   <div class="slots" id="slots" aria-live="polite"></div>
 </section>
-===== /Týždenný rozvrh ===== -->
+
+<section id="gallery">
+  <p class="eyebrow reveal">Z hodín a eventov</p>
+  <h2 class="reveal"><span class="grad">Galéria</span></h2>
+  <div class="gallery reveal">
+    <button class="gallery-item" data-full="assets/gallery/g1.jpg"><img src="assets/gallery/g1-thumb.jpg" alt="Lenka so skupinou tanečníc po hodine" loading="lazy" width="1200" height="1779"><span class="cap">Partia z hodiny</span></button>
+    <button class="gallery-item" data-full="assets/gallery/g2.jpg"><img src="assets/gallery/g2-thumb.jpg" alt="Lenka na Fitness Inspiration Day vo Vrábľoch" loading="lazy" width="700" height="933"><span class="cap">Fitness Inspiration Day</span></button>
+    <button class="gallery-item" data-full="assets/gallery/g3.jpg"><img src="assets/gallery/g3-thumb.jpg" alt="Lenka na pódiu so Zumba inštruktorkou" loading="lazy" width="700" height="933"><span class="cap">Na pódiu</span></button>
+    <button class="gallery-item" data-full="assets/gallery/g4.jpg"><img src="assets/gallery/g4-thumb.jpg" alt="Lenka so Zumba inštruktorom na evente" loading="lazy" width="700" height="933"><span class="cap">Zumba event</span></button>
+    <button class="gallery-item" data-full="assets/gallery/g5.jpg"><img src="assets/gallery/g5-thumb.jpg" alt="Portrét Lenky v Zumba tričku" loading="lazy" width="700" height="875"><span class="cap">Lenka</span></button>
+  </div>
+</section>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Galéria" aria-hidden="true">
+  <button class="lb-btn lb-close" aria-label="Zavrieť">✕</button>
+  <button class="lb-btn lb-prev" aria-label="Predchádzajúca fotka">‹</button>
+  <figure><img alt=""><figcaption></figcaption></figure>
+  <button class="lb-btn lb-next" aria-label="Ďalšia fotka">›</button>
+</div>
 
 <section id="reviews" class="classes-bg">
   <p class="eyebrow reveal" style="text-align:center">Čo hovoria tanečníci</p>
@@ -404,14 +503,15 @@
 </footer>
 
 <script>
-  // ---- Rozvrh (sekcia je zatiaľ skrytá v HTML): upravuj tu ----
+  // ---- Rozvrh "Kde ma zastihneš": upravuj tu ----
+  // PRÍKLADOVÉ údaje: adresy sú vymyslené, treba ich nahradiť skutočnými.
   const SCHEDULE = {
-    Pondelok: [{ time: '18:00', name: 'Zumba Fitness', place: 'Štúdio A' }],
-    Utorok:   [{ time: '10:00', name: 'Zumba Gold', place: 'Kultúrny dom' }],
-    Streda:   [{ time: '18:30', name: 'Zumba Toning', place: 'Štúdio A' }],
-    Štvrtok:  [{ time: '19:00', name: 'Zumba Fitness', place: 'Štúdio B' }],
-    Piatok:   [],
-    Sobota:   [{ time: '09:30', name: 'Zumba Fitness', place: 'Štúdio A' }, { time: '20:00', name: 'Párty večer', place: 'Štúdio A · posledná sobota v mesiaci' }],
+    Pondelok: [{ time: '18:00', name: 'Zumba Fitness', city: 'Ružomberok', place: 'Športová hala', address: 'Mostová 3' }],
+    Utorok:   [],
+    Streda:   [{ time: '17:00', name: 'Zumba Fitness', city: 'Ľubochňa', place: 'Telocvičňa ZŠ', address: 'Školská 2' }],
+    Štvrtok:  [{ time: '18:00', name: 'Zumba Gold', city: 'Liptovská Osada', place: 'Kultúrny dom', address: 'Hlavná 108' }],
+    Piatok:   [{ time: '17:30', name: 'Zumba Fitness', city: 'Ružomberok', place: 'Športová hala', address: 'Mostová 3' }],
+    Sobota:   [],
     Nedeľa:   []
   };
 
@@ -509,17 +609,53 @@
       tabs.querySelectorAll('.tab').forEach(t => { const on = t.dataset.day === day; t.classList.toggle('active', on); t.setAttribute('aria-selected', on); });
       const list = SCHEDULE[day];
       slots.innerHTML = list.length
-        ? list.map((s, i) => `<div class="slot" style="animation-delay:${i * .08}s"><time>${s.time}</time><div><h4>${s.name}</h4><small>${s.place}</small></div></div>`).join('')
+        ? list.map((s, i) => `<div class="slot" style="animation-delay:${i * .08}s">
+            <time>${s.time}</time>
+            <div><h4>${s.name} <span>· ${s.city}</span></h4><small>📍 ${s.place}, ${s.address}</small></div>
+            <a class="btn btn-ghost" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.address + ', ' + s.city)}">Mapa ↗</a>
+          </div>`).join('')
         : `<div class="empty">${day}: žiadne hodiny. Oddýchni si 💜</div>`;
     };
     days.forEach(d => {
       const b = document.createElement('button');
-      b.className = 'tab'; b.textContent = d; b.dataset.day = d; b.setAttribute('role', 'tab');
+      b.className = 'tab' + (SCHEDULE[d].length ? ' has-class' : ''); b.textContent = d; b.dataset.day = d; b.setAttribute('role', 'tab');
       b.addEventListener('click', () => renderDay(d));
       tabs.appendChild(b);
     });
     renderDay(days.find(d => d.toLowerCase() === today) || days[0]);
   }
+
+  // gallery lightbox: click a photo, then arrows / swipe / Esc
+  const lb = document.getElementById('lightbox'), lbImg = lb.querySelector('img'), lbCap = lb.querySelector('figcaption');
+  const shots = [...document.querySelectorAll('.gallery-item')];
+  let gi = 0, lastFocus = null;
+  const showShot = i => {
+    gi = (i + shots.length) % shots.length;
+    const s = shots[gi], thumb = s.querySelector('img');
+    lbImg.src = thumb.src; lbImg.alt = thumb.alt;           // instant preview
+    const full = new Image(); full.onload = () => { if (shots[gi] === s) lbImg.src = full.src; }; full.src = s.dataset.full;
+    lbCap.textContent = s.querySelector(".cap").textContent;
+  };
+  const openLb = i => { lastFocus = document.activeElement; showShot(i); lb.classList.add('open'); lb.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; lb.querySelector('.lb-close').focus(); };
+  const closeLb = () => { lb.classList.remove('open'); lb.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; if (lastFocus) lastFocus.focus(); };
+  shots.forEach((s, i) => s.addEventListener('click', () => openLb(i)));
+  lb.querySelector('.lb-close').addEventListener('click', closeLb);
+  lb.querySelector('.lb-prev').addEventListener('click', () => showShot(gi - 1));
+  lb.querySelector('.lb-next').addEventListener('click', () => showShot(gi + 1));
+  lb.addEventListener('click', e => { if (e.target === lb || e.target.tagName === 'FIGURE') closeLb(); });
+  document.addEventListener('keydown', e => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowLeft') showShot(gi - 1);
+    if (e.key === 'ArrowRight') showShot(gi + 1);
+  });
+  let touchX = null;
+  lb.addEventListener('touchstart', e => touchX = e.touches[0].clientX, { passive: true });
+  lb.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX; touchX = null;
+    if (Math.abs(dx) > 50) showShot(gi + (dx < 0 ? 1 : -1));
+  });
 
   // testimonials
   const quotes = [...document.querySelectorAll('.quote')], dots = document.querySelector('.dots');

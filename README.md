@@ -17,13 +17,13 @@ Double-click `index.html` to open it in your browser.
 The site is in Slovak (`lang="sk"`).
 
 - **Texts:** the About section, testimonials and FAQ are plain HTML in `index.html`
+- **Schedule ("Kde ma zastihneš"):** edit the `SCHEDULE` object at the top of the `<script>` (time, class, city, place, address). Each class gets a Google Maps link built from its address. The current addresses are made-up examples.
 
 ### Temporarily hidden sections
 
 These are commented out in `index.html` and can be brought back later:
 
 - **Class styles ("Štýly hodín"):** remove the `<!-- ===== DOČASNE SKRYTÉ: Štýly hodín` comment wrapper, and uncomment the "Hodiny" link in the menu
-- **Weekly timetable ("Týždenný rozvrh"):** remove the `<!-- ===== DOČASNE SKRYTÉ: Týždenný rozvrh` comment wrapper, and uncomment the "Rozvrh" link in the menu. Class times are in the `SCHEDULE` object at the top of the `<script>`.
 
 ## Hosting on GitHub Pages
 
